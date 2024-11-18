@@ -1,11 +1,14 @@
 "use client";
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Card, CardContent, CardMedia, Typography, Grid, Button, Checkbox } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Button, Grid2 } from '@mui/material';
 import { meals as initialMeals } from '@/service/mealData';
-import styled from '@emotion/styled';
+import CheckboxGroup from '@/components/share/form/CheckboxGroup';
+import { useForm, Controller } from 'react-hook-form';
 
 export default function Meal() {
+    const { control, setValue } = useForm();
     const searchParams = useSearchParams();
     const mealCategory = searchParams.get("category");
     const [meals, setMeals] = useState(initialMeals);
@@ -13,6 +16,22 @@ export default function Meal() {
         const savedData = localStorage.getItem("orderDataList");
         return savedData ? JSON.parse(savedData) : [];
     });
+
+    const toggleOrderItem = (meal) => {
+        const isAlreadyInOrder = orderData.some(orderItem => orderItem.id === meal.id);
+
+        const updatedOrderData = isAlreadyInOrder
+            ? orderData.filter(orderItem => orderItem.id !== meal.id) // Remove
+            : [...orderData, meal]; // Add
+
+        setOrderData(updatedOrderData);
+        localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
+    };
+
+    // Sync localStorage with orderData when orderData updates
+    useEffect(() => {
+        localStorage.setItem("orderDataList", JSON.stringify(orderData));
+    }, [orderData]);
 
     const handleQuantity = (mealId, type) => {
         setMeals(prevMeals =>
@@ -26,76 +45,88 @@ export default function Meal() {
         );
     };
 
-    const toggleOrderItem = (meal) => {
-        const isAlreadyInOrder = orderData.some(orderItem => orderItem.id === meal.id);
-
-        if (isAlreadyInOrder) {
-            // Remove item if it's already in the order
-            const updatedOrderData = orderData.filter(orderItem => orderItem.id !== meal.id);
-            setOrderData(updatedOrderData);
-            localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
-        } else {
-            // Add item if it's not in the order
-            const updatedOrderData = [...orderData, meal];
-            setOrderData(updatedOrderData);
-            localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
-        }
-    };
-
-    useEffect(() => {
-        localStorage.setItem("orderDataList", JSON.stringify(orderData));
-    }, [orderData]);
-
-    const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
-        color: "transparent",
-        "&.Mui-checked": {
-            color: "green",
-        },
-        "& .MuiSvgIcon-root": {
-            fontSize: 48, // Adjust size as needed
-        },
-    }));
-
     return (
         <div>
-            <h1>Meals</h1>
-            <Grid container spacing={4}>
+            <Grid2 container spacing={4} className="!ms-8 mt-8">
                 {meals.map(meal => (
                     mealCategory === meal.type && (
                         <Grid item xs={12} sm={6} md={4} key={meal.id}>
+                            <CheckboxGroup
+                                name={meal.name}
+                                options={[meal]}
+                                control={control}
+                                setValue={(name, value) => {
+                                    setValue(name, value);
+                                    toggleOrderItem(meal);
+                                }}
+
+                            />
                             <Card>
-                                <CustomCheckbox
-                                    checked={orderData.some(orderItem => orderItem.id === meal.id)}
-                                    onClick={() => toggleOrderItem(meal)}
-                                    inputProps={{ 'aria-label': 'controlled' }}
-                                />
-                                <CardMedia
-                                    onClick={() => toggleOrderItem(meal)}
-                                    component="img"
-                                    alt={meal.name}
-                                    height="140"
-                                    image={meal.image}
-                                />
                                 <CardContent>
-                                    <Typography variant="h6" component="div">
+                                    <Typography variant="h4" component="div">
                                         {meal.name}
+                                    </Typography>
+                                    <Typography variant="h6" component="div">
+                                        <b>${meal.price}</b>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         {meal.type === 'veg' ? 'Vegetarian' : 'Non-Vegetarian'}
                                     </Typography>
                                     <Typography>
-                                        Quantity:
-                                        <Button onClick={() => handleQuantity(meal.id, "icr")}>+</Button>
-                                        {meal.quantity}
-                                        <Button onClick={() => handleQuantity(meal.id, "dec")}>-</Button>
+                                        Quantity:&nbsp;
+                                        <Button
+                                            onClick={() => handleQuantity(meal.id, "icr")}
+                                            sx={{
+                                                minWidth: '36px',
+                                                height: '36px',
+                                                padding: 0,
+                                                backgroundColor: '#4caf50',
+                                                color: '#fff',
+                                                borderRadius: '50%',
+                                                '&:hover': {
+                                                    backgroundColor: '#388e3c',
+                                                }
+                                            }}
+                                        >
+                                            +
+                                        </Button>
+                                        <input
+                                            type="number"
+                                            value={meal.quantity}
+                                            onChange={(e) => setMeals(prevMeals => prevMeals.map(m => m.id === meal.id ? { ...m, quantity: Math.max(Number(e.target.value), 1) } : m))}
+                                            style={{
+                                                width: '50px',
+                                                textAlign: 'center',
+                                                margin: '0 8px',
+                                                fontSize: '16px',
+                                                padding: '5px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '4px',
+                                            }}
+                                        />
+                                        <Button
+                                            onClick={() => handleQuantity(meal.id, "dec")}
+                                            sx={{
+                                                minWidth: '36px',
+                                                height: '36px',
+                                                padding: 0,
+                                                backgroundColor: '#f44336',
+                                                color: '#fff',
+                                                borderRadius: '50%',
+                                                '&:hover': {
+                                                    backgroundColor: '#d32f2f',
+                                                }
+                                            }}
+                                        >
+                                            -
+                                        </Button>
                                     </Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
                     )
                 ))}
-            </Grid>
-
+            </Grid2>
 
             <div className="order-button-container">
                 <Button

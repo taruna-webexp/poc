@@ -1,43 +1,57 @@
-'use client';
+"use client";
 
 import React from "react";
 import { Controller } from "react-hook-form";
 
-const CheckboxGroup = ({ name, options, control }) => {
+const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem }) => {
+
+
     return (
+
+
         options.map((option) => (
             <div key={option.value} className="flex flex-col items-center">
-                {/* Image */}
-                <img
-                    src={option.image}
-                    alt={`${option.label} Meal`}
-                    className="w-32 h-32 object-cover rounded-md shadow-md mb-2"
-                />
-
                 <Controller
-                    name={`${name}.${option.value}`} // Unique name for each checkbox
+                    name={`${name}.${option.value}`}
                     control={control}
-                    defaultValue={false} // Default value set to false (unchecked)
+                    defaultValue={false}
                     render={({ field }) => (
-                        <input
-                            type="checkbox"
-                            {...field}
-                            checked={field.value} // Ensure the checkbox is checked if its value is true
-                            onChange={(e) => field.onChange(e.target.checked)} // Handle the checkbox change event
-                            value={option.value} // Ensure each checkbox has its unique value
-                        />
+                        <>
+                            <input
+                                type="checkbox"
+                                {...field}
+                                checked={field.value}
+                                onChange={(e) => {
+                                    field.onChange(e.target.checked)
+                                    toggleOrderItem(option)
+                                }
+                                }
+                                className="hidden"
+                            />
+
+                            <img
+                                src={option.image}
+                                alt={`${option.label} Meal`}
+                                onClick={() => {
+                                    setValue(`${name}.${option.value}`, !field.value);
+                                }}
+                                className={`w-full h-full object-cover rounded-md shadow-md mb-2 cursor-pointer ${field.value ? "ring-8 ring-green-500 ring-offset-4" : ""
+                                    }`}
+                            />
+
+                            <label
+                                htmlFor={option.value}
+                                className={`text-4xl font-bold ${field.value ? "text-green-600" : "text-gray-600"}`}
+                            >
+                                {option.label}
+                            </label>
+                        </>
                     )}
                 />
-
-
-
-
-                <label htmlFor={option.value} className="text-lg font-medium text-gray-600">
-                    {option.label}
-                </label>
             </div>
         ))
-    )
+
+    );
 };
 
 export default CheckboxGroup;
