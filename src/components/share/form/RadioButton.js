@@ -25,7 +25,7 @@ const RadioButtonsGroup = ({ control, options }) => {
                                     <FormControlLabel
                                         value={option.value}
                                         control={<Radio />}
-                                        className="!hidden"
+                                        className=""
                                     />
                                     <div
                                         className={`flex flex-col items-center cursor-pointer 

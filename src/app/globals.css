@@ -5,3 +5,6 @@
 .adminpanel-component .MuiDrawer-paperAnchorLeft {
   position: relative;
 }
+.item-listing-container {
+  margin: 0 auto !important;
+}
