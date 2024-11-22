@@ -28,7 +28,12 @@ export default function TemporaryDrawer({ open, setOpen }) {
     ];
 
     const DrawerList = (
-        <Box sx={{ width: 230 }} role="presentation">
+        <Box className="" sx={{
+            width: 230,
+            // height: 'auto',
+
+            background: "transparent",
+        }} role="presentation">
             <List>
                 {adminPageUrl.map(({ text, href }, index) => (
                     <ListItem key={text} disablePadding>
@@ -45,7 +50,7 @@ export default function TemporaryDrawer({ open, setOpen }) {
                     </ListItem>
                 ))}
             </List>
-            <Divider />
+
 
         </Box>
     );
@@ -53,7 +58,7 @@ export default function TemporaryDrawer({ open, setOpen }) {
     return (
         <>
             {/* The Drawer */}
-            <Drawer open={open} onClose={() => { }} variant="persistent" className="adminpanel-component ">
+            <Drawer open={open} onClose={() => { }} variant="persistent" className="adminpanel-component  ">
                 {DrawerList}
             </Drawer>
 

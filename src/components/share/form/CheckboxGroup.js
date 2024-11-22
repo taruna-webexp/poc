@@ -3,7 +3,8 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 
-const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, defaultChecked }) => {
+const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, handleChangeCategory, selectedCategories }) => {
+    console.log("selectedCategories11111", selectedCategories)
     return (
         <>
             {options.map((option) => (
@@ -11,17 +12,21 @@ const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, defa
                     <Controller
                         name={`${name}.${option.value}`}
                         control={control}
-                        defaultValue={defaultChecked ? defaultChecked : ""}
+                        defaultValue={""}
                         render={({ field }) => (
                             <>
                                 <input
                                     type="checkbox"
                                     {...field}
+                                    color="success"
+                                    checked={selectedCategories ? selectedCategories.includes(option.value) : field.value}
 
-                                    checked={field.value}
                                     onChange={(e) => {
                                         field.onChange(e.target.checked);
-                                        toggleOrderItem(option);
+                                        handleChangeCategory(e, option)
+                                        if (toggleOrderItem) {
+                                            toggleOrderItem([option]);
+                                        }
                                     }}
                                     className={`${name !== "mealCategory" ? "hidden" : ""} w-full !h-6`}
                                 />
@@ -43,8 +48,8 @@ const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, defa
                                 }
                                 <label
                                     htmlFor={option.value}
-                                    className={`text-4xl font-bold ${field.value ? "text-green-600" : "text-gray-600"
-                                        }`}
+                                    className={`text-xl font-bold ${selectedCategories && selectedCategories.includes(option.value) ? "text-green-600" : "text-gray-600"}
+                                        `}
                                 >
                                     {option.label}
                                 </label>

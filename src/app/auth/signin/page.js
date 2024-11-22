@@ -35,7 +35,7 @@ const Login = () => {
                 // errorMsg("Invalid credentials");
             } else {
                 alert("Login Successfully")
-                // successMsg("Login Successfully");
+
                 router.push("/admin/order");
             }
         } catch (error) {
@@ -58,6 +58,7 @@ const Login = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="w-2/5 bg-gray-100 px-8 py-8" >
                 <div className="text-center">
+                    <img src="/foody.webp" width="30%" className="authentication-logo" />
                     <Typography variant="h4" component="h1" className="font-bold">
                         <LocalDiningIcon fontSize="large" /> Food Prepation
                     </Typography>

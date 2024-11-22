@@ -4,7 +4,14 @@
 
 .adminpanel-component .MuiDrawer-paperAnchorLeft {
   position: relative;
+  background-color: #f1d7d782;
 }
 .item-listing-container {
   margin: 0 auto !important;
 }
+.authentication-logo {
+  margin: 0 auto;
+}
+/* .orderhistory-container {
+  margin: 0 auto;
+} */

@@ -22,7 +22,8 @@ export default function AdminLayout({ children }) {
                             width: open ? 250 : 0, // Adjust width based on Drawer state
                             transition: "width 0.3s ease", // Smooth transition
                             height: "100vh", // Full height
-                            backgroundColor: "#f4f4f4", // Background color for the drawer
+                            backgroundColor: "#fdb1b182",
+
                             position: "relative",
                             // For centering the toggle button
                         }}
