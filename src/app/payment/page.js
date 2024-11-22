@@ -38,6 +38,8 @@ function Payment() {
 
         // Save back to localStorage
         localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+        localStorage.setItem("chefOrderDataList", JSON.stringify(updatedOrders));
+
 
         alert("Thank you for your payment! Your transaction has been successfully processed.");
         router.push("/orderhistory");

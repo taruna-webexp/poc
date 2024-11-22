@@ -107,8 +107,9 @@ const Home = () => {
       date: new Date().toISOString(),
       items: updatedOrderData,
     };
-    localStorage.setItem("orderDataList", JSON.stringify(newOrderData));
-    localStorage.setItem("chefOrderDataList", JSON.stringify(newOrderData));
+
+
+    localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
 
     localStorage.setItem("orderplaceList", JSON.stringify(updatedOrderData));
   };

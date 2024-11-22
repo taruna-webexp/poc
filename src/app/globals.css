@@ -12,6 +12,10 @@
 .authentication-logo {
   margin: 0 auto;
 }
+.table-head-row th {
+  background-color: rgb(75, 74, 74);
+  color: white;
+}
 /* .orderhistory-container {
   margin: 0 auto;
 } */
