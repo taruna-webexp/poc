@@ -16,6 +16,9 @@
   background-color: rgb(75, 74, 74);
   color: white;
 }
+.home-container {
+  margin: 0 auto !important;
+}
 /* .orderhistory-container {
   margin: 0 auto;
 } */

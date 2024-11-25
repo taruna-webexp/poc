@@ -23,6 +23,7 @@ export async function middleware(request) {
   // Redirect logged-in users away from unprotected routes
   if (isUnprotectedRoute && token) {
     return NextResponse.redirect(new URL(ProtectedRoutes[0], request.url));
+    //redirect the user to the first protected route in the ProtectedRoutes array (/admin/order).
   }
 
   // Redirect unauthenticated users trying to access protected routes

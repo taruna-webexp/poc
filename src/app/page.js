@@ -141,7 +141,7 @@ const Home = () => {
 
 
   return (<>
-    <Grid container spacing={2} className="mt-4">
+    <Grid container maxWidth="lg" spacing={2} className=" home-container mt-4" >
       <LayoutHeader pageTitle="All Menu Items" />
       <Grid item xs={12}>
         <form
@@ -274,7 +274,7 @@ const Home = () => {
             : `${totalPrice ? `$${totalPrice.toFixed(2)}` : ""} Place Order`}
         </Button>
       </Grid>
-    </Grid>
+    </Grid >
   </>
   );
 };

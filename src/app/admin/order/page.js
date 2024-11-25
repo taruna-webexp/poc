@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import {
     TableContainer,
@@ -11,93 +12,62 @@ import {
     Paper,
     TablePagination,
     Grid,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
 } from "@mui/material";
 import LayoutHeader from "@/app/layoutHearTitle";
 import dayjs from "dayjs";
-import DatePicker from "@/components/share/form/DatePicker";
 import { useForm } from "react-hook-form";
+import BasicDatePicker from "@/components/share/form/DatePicker";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function Order() {
     const [orderData, setOrderData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-    const [page, setPage] = useState(0); // Current page
-    const [rowsPerPage, setRowsPerPage] = useState(5); // Rows per page
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    // DATEFILTER
-    const { control, handleSubmit } = useForm({
+    const today = dayjs();
+
+    const { control, handleSubmit, watch } = useForm({
         defaultValues: {
-            dateRange: [dayjs(), dayjs()], // Default value for both start and end date
+            startDateRange: today.subtract(1, "month"),
+            endDateRange: today,
         },
     });
 
-
-    // Form submit handler
-    const onSubmit = (data) => {
-        const [startDate, endDate] = data.dateRange;
-
-        if (startDate || endDate) {
-            // Format dates to exclude the time part for comparison
-            const formattedStartDate = startDate ? dayjs(startDate).format("YYYY-MM-DD") : null;
-            const formattedEndDate = endDate ? dayjs(endDate).format("YYYY-MM-DD") : null;
-
-            const filteredByDate = orderData.filter((item) => {
-                const itemDate = dayjs(item.date).format("YYYY-MM-DD");
-                return (
-                    itemDate === formattedStartDate ||
-                    itemDate === formattedEndDate
-                );
-            });
-
-            console.log("Filtered Data:", filteredByDate);
-            setFilteredData(filteredByDate);
-        } else {
-            setFilteredData(orderData); // Show all data if no date is selected
-        }
-    };
+    const startDate = watch("startDateRange");
+    const endDate = watch("endDateRange");
 
     useEffect(() => {
-        // Retrieve and parse the order data from localStorage
         const data = JSON.parse(localStorage.getItem("chefOrderDataList")) || [];
-        console.log("DATA", data);
-
-        // Format the date for each order to include only the date part
         const formattedOrders = data.map((order) => ({
             ...order,
-            date: dayjs(order.date).format("YYYY-MM-DD"), // Format to YYYY-MM-DD
+            date: dayjs(order.date).format("YYYY-MM-DD"),
         }));
 
         setOrderData(formattedOrders);
-        setFilteredData(formattedOrders); // Initialize filteredData
+        setFilteredData(formattedOrders);
     }, []);
 
-    const handleRemoveItem = (orderIndex, itemId) => {
-        // Remove the item by itemId within the specific order
-        const updatedOrderData = filteredData.map((order, index) => {
-            if (index === orderIndex) {
-                return {
-                    ...order,
-                    items: order.items.filter((item) => item.id !== itemId),
-                };
-            }
-            return order;
+    const onSubmit = ({ startDateRange, endDateRange }) => {
+        const filtered = orderData.filter((order) => {
+            const orderDate = dayjs(order.date).format("YYYY-MM-DD");
+            const start = dayjs(startDateRange).format("YYYY-MM-DD");
+            const end = dayjs(endDateRange).format("YYYY-MM-DD");
+            return orderDate >= start && orderDate <= end;
         });
-
-        setOrderData(updatedOrderData);
-        setFilteredData(updatedOrderData);
+        setFilteredData(filtered);
     };
 
-    // Handle page change
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
 
-    // Handle rows per page change
+    const handleChangePage = (event, newPage) => setPage(newPage);
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    // Calculate rows to display based on pagination
     const rowsToDisplay = [...filteredData]
         .reverse()
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -105,19 +75,36 @@ export default function Order() {
     return (
         <>
             <LayoutHeader pageTitle="All Orders" />
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={2} className="align-center my-6">
-                    <Grid item xs={12} sm={6}>
-                        <DatePicker name="dateRange" control={control} /></Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Button className="!mt-4 !bg-red-500 hover:!bg-red-600  " type="submit" variant="contained" size="large">
-                            Submit
-                        </Button>
-                    </Grid> </Grid>
 
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
+                <Grid container spacing={2} className="align-center my-6">
+                    <Grid item xs={5} sm={5}>
+                        <BasicDatePicker
+                            name="startDateRange"
+                            control={control}
+                            maxDate={endDate}
+                        />
+                    </Grid>
+                    <Grid item xs={5} sm={5}>
+                        <BasicDatePicker
+                            name="endDateRange"
+                            control={control}
+                            minDate={startDate}
+                        />
+                    </Grid>
+                    <Grid item xs={2} sm={2}>
+                        <Button
+                            className="!mt-2 !bg-red-500 hover:!bg-red-600 text-center"
+                            type="submit"
+                            variant="contained"
+                            size="large"
+                        >
+                            Apply
+                        </Button>
+                    </Grid>
+                </Grid>
             </form>
 
-            {/* Table Section */}
             <TableContainer sx={{ maxHeight: 580 }} component={Paper}>
                 <Table stickyHeader sx={{ minWidth: 850 }} aria-label="sticky table">
                     <TableHead>
@@ -127,70 +114,101 @@ export default function Order() {
                             <TableCell align="right">Category</TableCell>
                             <TableCell align="right">Quantity</TableCell>
                             <TableCell align="right">Price</TableCell>
-                            <TableCell align="center">Cancel</TableCell>
+                            <TableCell align="right"></TableCell>
+
                         </TableRow>
                     </TableHead>
-
-                    <TableBody>
+                    <TableBody className="bg-red-100">
                         {rowsToDisplay.map((order, orderIndex) => (
                             <React.Fragment key={orderIndex}>
                                 <TableRow sx={{ backgroundColor: "#cfc2c2", color: "white" }}>
                                     <TableCell colSpan={6} sx={{ fontWeight: "bold", color: "black" }}>
-                                        <span className="text-red-600">{dayjs(order.date).format("MMMM D, YYYY [at] h:mm A")}</span>
+                                        <span className="text-red-600">
+                                            {dayjs(order.date).format(
+                                                "MMMM D, YYYY [at] h:mm A"
+                                            )}
+                                        </span>
                                     </TableCell>
                                 </TableRow>
 
-                                {order.items.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        sx={{
-                                            "&:last-child td, &:last-child th": { border: 0 },
-                                            backgroundColor: "#e5dede",
-                                            color: "white",
-                                        }}
-                                    >
-                                        <TableCell align="center">
-                                            <img
-                                                src={row.image}
-                                                alt="food img"
-                                                style={{
-                                                    width: "50px",
-                                                    height: "50px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "8px",
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="right">{row.name}</TableCell>
-                                        <TableCell align="right">{row.type}</TableCell>
-                                        <TableCell align="right">{row.quantity}</TableCell>
-                                        <TableCell align="right">${row.price}</TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                variant="contained"
-                                                color="error"
-                                                onClick={() => handleRemoveItem(orderIndex, row.id)}
-                                            >
-                                                Cancel Item
-                                            </Button>
+                                {/* Display the first item */}
+                                <TableRow>
+                                    <TableCell align="center">
+                                        <img
+                                            src={order.items[0].image}
+                                            alt="food img"
+                                            style={{
+                                                width: "50px",
+                                                height: "50px",
+                                                objectFit: "cover",
+                                                borderRadius: "8px",
+                                            }}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="right">{order.items[0].name}</TableCell>
+                                    <TableCell align="right">{order.items[0].type}</TableCell>
+                                    <TableCell align="right">{order.items[0].quantity}</TableCell>
+                                    <TableCell align="right">${order.items[0].price}</TableCell>
+                                    <TableCell align="right"></TableCell>
+
+
+                                </TableRow>
+
+                                {/* Display the remaining items in an accordion */}
+                                {order.items.length > 1 && (
+                                    <TableRow>
+                                        <TableCell colSpan={6} style={{ padding: 0 }}>
+                                            <Accordion style={{ width: "100%" }}>
+                                                <AccordionSummary expandIcon={<ExpandMoreIcon />} style={{ width: "100%", position: "absolute", top: "-65px", right: 0 }}>
+
+                                                </AccordionSummary>
+                                                <AccordionDetails style={{ padding: 0 }}>
+                                                    <Table style={{ width: "100%" }}>
+                                                        <TableBody className="bg-red-100">
+                                                            {order.items.slice(1).map((item, itemIndex) => (
+                                                                <TableRow key={itemIndex}>
+                                                                    <TableCell align="center">
+                                                                        <img
+                                                                            src={item.image}
+                                                                            alt="food img"
+                                                                            style={{
+                                                                                width: "50px",
+                                                                                height: "50px",
+                                                                                objectFit: "cover",
+                                                                                borderRadius: "8px",
+                                                                            }}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="right">{item.name}</TableCell>
+                                                                    <TableCell align="right">{item.type}</TableCell>
+                                                                    <TableCell align="right">{item.quantity}</TableCell>
+                                                                    <TableCell align="right">${item.price}</TableCell>
+                                                                    <TableCell align="right"></TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </AccordionDetails>
+                                            </Accordion>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+
+
+                                )}
                             </React.Fragment>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Pagination */}
             <TablePagination
                 component="div"
-                count={filteredData.length} // Total number of rows
-                page={page} // Current page
-                onPageChange={handleChangePage} // Page change handler
-                rowsPerPage={rowsPerPage} // Rows per page
-                onRowsPerPageChange={handleChangeRowsPerPage} // Rows per page change handler
-                rowsPerPageOptions={[5, 10, 15]} // Options for rows per page
+                count={filteredData.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 15]}
             />
         </>
     );

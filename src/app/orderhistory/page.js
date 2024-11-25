@@ -57,9 +57,9 @@ export default function OrderHistory() {
                                                     <span className="font-semibold text-gray-700">{item.name}</span>
                                                 }
                                                 secondary={
-                                                    <div className="text-gray-500 text-sm">
+                                                    <span className="text-gray-500 text-sm">
                                                         Type: <span className="font-medium">{item.type}</span> | Price: <span className="font-medium">${item.price}</span> | Quantity: <span className="font-medium">{item.quantity}</span>
-                                                    </div>
+                                                    </span>
                                                 }
                                             />
                                         </ListItem>
