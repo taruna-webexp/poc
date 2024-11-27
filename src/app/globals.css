@@ -22,3 +22,6 @@
 /* .orderhistory-container {
   margin: 0 auto;
 } */
+.accordionSummaryContent .MuiAccordionSummary-content {
+  justify-content: end;
+}

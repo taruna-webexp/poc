@@ -26,11 +26,14 @@ function Payment() {
     const handleProceedPayment = () => {
         // Fetch existing orders from localStorage
         const existingOrders = JSON.parse(localStorage.getItem("myOrders")) || [];
+        const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
 
         // Create a new order structure with a single date
         const newOrder = {
+
             date: new Date().toISOString(),
             items: orderData,
+            chefs: chefList,
         };
 
         // Combine new and existing orders

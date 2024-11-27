@@ -8,11 +8,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@mui/material";
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 

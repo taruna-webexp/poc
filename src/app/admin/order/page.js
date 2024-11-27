@@ -21,13 +21,15 @@ import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import BasicDatePicker from "@/components/share/form/DatePicker";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useSession } from "next-auth/react";
 
 export default function Order() {
     const [orderData, setOrderData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-
+    const session = useSession();
+    const [chef, setChef] = useState([]);
     const today = dayjs();
 
     const { control, handleSubmit, watch } = useForm({
@@ -61,16 +63,40 @@ export default function Order() {
         setFilteredData(filtered);
     };
 
-
     const handleChangePage = (event, newPage) => setPage(newPage);
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const rowsToDisplay = [...filteredData]
+
+
+    useEffect(() => {
+        const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
+        setChef(chefList);
+
+    }, [filteredData]);
+
+    // Devide data  per chef
+    const ordersPerChef = Math.ceil(filteredData.length / chef.length);
+    console.log("devideordersPerChef", ordersPerChef)
+    const dividedOrders = chef.map((_, index) => {
+        // devide orders to chefs
+        const start = index * ordersPerChef;
+        const end = Math.min(start + ordersPerChef, filteredData.length);
+        return filteredData.slice(start, end);
+    });
+
+
+    const currentChef = session?.data?.user?.email; //current user
+    const ifCurrentChefExist = chef.findIndex((item) => item.email === currentChef)
+
+    // Filter orders for the current chef
+    const currentChefOrders = dividedOrders[ifCurrentChefExist] || [];    //assign order
+    const rowsToDisplay = [...currentChefOrders]
         .reverse()
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
 
     return (
         <>
@@ -115,7 +141,6 @@ export default function Order() {
                             <TableCell align="right">Quantity</TableCell>
                             <TableCell align="right">Price</TableCell>
                             <TableCell align="right"></TableCell>
-
                         </TableRow>
                     </TableHead>
                     <TableBody className="bg-red-100">
@@ -150,17 +175,15 @@ export default function Order() {
                                     <TableCell align="right">{order.items[0].quantity}</TableCell>
                                     <TableCell align="right">${order.items[0].price}</TableCell>
                                     <TableCell align="right"></TableCell>
-
-
                                 </TableRow>
 
                                 {/* Display the remaining items in an accordion */}
                                 {order.items.length > 1 && (
                                     <TableRow>
                                         <TableCell colSpan={6} style={{ padding: 0 }}>
-                                            <Accordion style={{ width: "100%" }}>
-                                                <AccordionSummary expandIcon={<ExpandMoreIcon />} style={{ width: "100%", position: "absolute", top: "-65px", right: 0 }}>
-
+                                            <Accordion style={{ width: "100%", }}>
+                                                <AccordionSummary className="accordionSummaryContent" expandIcon={<ExpandMoreIcon />} style={{ width: "100%", position: "absolute", top: "-65px", right: 0 }}>
+                                                    <span>More</span>
                                                 </AccordionSummary>
                                                 <AccordionDetails style={{ padding: 0 }}>
                                                     <Table style={{ width: "100%" }}>
@@ -192,8 +215,6 @@ export default function Order() {
                                             </Accordion>
                                         </TableCell>
                                     </TableRow>
-
-
                                 )}
                             </React.Fragment>
                         ))}
@@ -203,7 +224,7 @@ export default function Order() {
 
             <TablePagination
                 component="div"
-                count={filteredData.length}
+                count={currentChefOrders.length}
                 page={page}
                 onPageChange={handleChangePage}
                 rowsPerPage={rowsPerPage}
