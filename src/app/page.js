@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import LayoutHeader from "./layoutHearTitle";
+import { successMsg } from "@/components/msg/toaster";
 
 const Home = () => {
   const { control, handleSubmit, setValue } = useForm();
@@ -75,7 +76,7 @@ const Home = () => {
   useEffect(() => {
     // Update total price whenever orderData changes
     const calculateTotalPrice = () => {
-      const total = orderData.reduce((total, item) => total + item.price * item.quantity, 0);
+      const total = orderData?.reduce((total, item) => total + item.price * item.quantity, 0);
       setTotalPrice(total);
     };
     calculateTotalPrice();
@@ -133,7 +134,8 @@ const Home = () => {
 
   //order place function
   const placeOrderHandler = () => {
-    alert(`Your order has been placed! Total: $${totalPrice.toFixed(2)}`);
+    successMsg(`Your order has been placed! Total: $${totalPrice.toFixed(2)}`);
+
     router.push("/payment")
     localStorage.removeItem("orderDataList")
   };

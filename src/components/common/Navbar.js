@@ -59,27 +59,22 @@ const Navbar = ({ open, setOpen }) => {
                                     {session?.data?.user?.email}
                                 </p>
                             </Link>
-                            <p
-                                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-                                className="hover:text-gray-300 cursor-pointer"
-                            >
-                                Signout
-                            </p></>) : (<>
-                                <Link href="/user" className="hover:text-gray-300">
-                                    <p
-                                        onClick={() => router.push("/auth/signin")}
-                                        className="hover:text-gray-300 cursor-pointer"
-                                    >
-                                        {session.data}
-                                    </p>
-                                </Link>
-
+                        </>) : (<>
+                            <Link href="/user" className="hover:text-gray-300">
                                 <p
                                     onClick={() => router.push("/auth/signin")}
                                     className="hover:text-gray-300 cursor-pointer"
                                 >
-                                    Signin
-                                </p></>)}
+                                    {session.data}
+                                </p>
+                            </Link>
+
+                            <p
+                                onClick={() => router.push("/auth/signin")}
+                                className="hover:text-gray-300 cursor-pointer"
+                            >
+                                Signin
+                            </p></>)}
                     </div>
                 </div>
             </nav>

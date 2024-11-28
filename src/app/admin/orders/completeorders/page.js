@@ -15,16 +15,18 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
+    Typography,
 } from "@mui/material";
-import LayoutHeader from "@/app/layoutHearTitle";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import BasicDatePicker from "@/components/share/form/DatePicker";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useSession } from "next-auth/react";
+import FormInput from "@/components/share/form/FormInput";
+import LayoutHeader from "@/app/layoutHearTitle";
 
-export default function Order() {
-    const [orderData, setOrderData] = useState([]);
+export default function CompleteOrder() {
+    const [completedOrderData, setCompletedOrderData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -43,25 +45,34 @@ export default function Order() {
     const endDate = watch("endDateRange");
 
     useEffect(() => {
-        const data = JSON.parse(localStorage.getItem("chefOrderDataList")) || [];
+        const data = JSON.parse(localStorage.getItem("chefCompletedOrder")) || [];
         const formattedOrders = data.map((order) => ({
             ...order,
             date: dayjs(order.date).format("YYYY-MM-DD"),
         }));
 
-        setOrderData(formattedOrders);
+        setCompletedOrderData(formattedOrders);
         setFilteredData(formattedOrders);
     }, []);
 
-    const onSubmit = ({ startDateRange, endDateRange }) => {
-        const filtered = orderData.filter((order) => {
+    const onSubmit = ({ startDateRange, endDateRange, orderNumber }) => {
+        let filtered = completedOrderData.filter((order) => {
             const orderDate = dayjs(order.date).format("YYYY-MM-DD");
             const start = dayjs(startDateRange).format("YYYY-MM-DD");
             const end = dayjs(endDateRange).format("YYYY-MM-DD");
-            return orderDate >= start && orderDate <= end;
+
+            // Filter by date 
+            const dateInRange = orderDate >= start && orderDate <= end;
+
+            // Filter by order number 
+            const orderNumberMatch = orderNumber ? order.orderId.toString() === orderNumber.toString() : true;
+
+            return dateInRange && orderNumberMatch;
         });
+
         setFilteredData(filtered);
     };
+
 
     const handleChangePage = (event, newPage) => setPage(newPage);
     const handleChangeRowsPerPage = (event) => {
@@ -69,62 +80,46 @@ export default function Order() {
         setPage(0);
     };
 
-
-
     useEffect(() => {
         const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
         setChef(chefList);
-
     }, [filteredData]);
 
-    // Devide data  per chef
+    // Divide data per chef
     const ordersPerChef = Math.ceil(filteredData.length / chef.length);
-    console.log("devideordersPerChef", ordersPerChef)
     const dividedOrders = chef.map((_, index) => {
-        // devide orders to chefs
         const start = index * ordersPerChef;
         const end = Math.min(start + ordersPerChef, filteredData.length);
         return filteredData.slice(start, end);
     });
 
-
-    const currentChef = session?.data?.user?.email; //current user
-    const ifCurrentChefExist = chef.findIndex((item) => item.email === currentChef)
+    const currentChef = session?.data?.user?.email;
+    const ifCurrentChefExist = chef.findIndex((item) => item.email === currentChef);
 
     // Filter orders for the current chef
-    const currentChefOrders = dividedOrders[ifCurrentChefExist] || [];    //assign order
+    const currentChefOrders = dividedOrders[ifCurrentChefExist] || [];
     const rowsToDisplay = [...currentChefOrders]
         .reverse()
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-
     return (
         <>
-            <LayoutHeader pageTitle="All Orders" />
+
+            <LayoutHeader pageTitle="Completed Orders" />
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
                 <Grid container spacing={2} className="align-center my-6">
-                    <Grid item xs={5} sm={5}>
-                        <BasicDatePicker
-                            name="startDateRange"
-                            control={control}
-                            maxDate={endDate}
-                        />
+                    <Grid item xs={3} sm={4}>
+                        <BasicDatePicker name="startDateRange" control={control} maxDate={endDate} />
                     </Grid>
-                    <Grid item xs={5} sm={5}>
-                        <BasicDatePicker
-                            name="endDateRange"
-                            control={control}
-                            minDate={startDate}
-                        />
+                    <Grid item xs={3} sm={4}>
+                        <BasicDatePicker name="endDateRange" control={control} minDate={startDate} />
                     </Grid>
-                    <Grid item xs={2} sm={2}>
-                        <Button
-                            className="!mt-2 !bg-red-500 hover:!bg-red-600 text-center"
-                            type="submit"
-                            variant="contained"
-                            size="large"
-                        >
+                    <Grid item xs={3} sm={3}>
+                        <FormInput name="orderNumber" control={control} inputType="number" placeholder="Order Id" />
+                    </Grid>
+                    <Grid item xs={2} sm={1}>
+                        <Button className="!mt-2 !bg-red-500 hover:!bg-red-600 text-white font-bold" type="submit" variant="contained" size="large">
                             Apply
                         </Button>
                     </Grid>
@@ -135,16 +130,17 @@ export default function Order() {
                 <Table stickyHeader sx={{ minWidth: 850 }} aria-label="sticky table">
                     <TableHead>
                         <TableRow className="table-head-row">
+                            <TableCell>Order Id</TableCell>
                             <TableCell>Order Item</TableCell>
                             <TableCell align="right">Order Name</TableCell>
                             <TableCell align="right">Category</TableCell>
                             <TableCell align="right">Quantity</TableCell>
-                            <TableCell align="right">Price</TableCell>
+                            {/* <TableCell align="right">Price</TableCell> */}
                             <TableCell align="right"></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody className="bg-red-100">
-                        {rowsToDisplay.map((order, orderIndex) => (
+                        {rowsToDisplay.length > 0 ? rowsToDisplay.map((order, orderIndex) => (
                             <React.Fragment key={orderIndex}>
                                 <TableRow sx={{ backgroundColor: "#cfc2c2", color: "white" }}>
                                     <TableCell colSpan={6} sx={{ fontWeight: "bold", color: "black" }}>
@@ -156,8 +152,8 @@ export default function Order() {
                                     </TableCell>
                                 </TableRow>
 
-                                {/* Display the first item */}
                                 <TableRow>
+                                    <TableCell align="left">{order.orderId}</TableCell>
                                     <TableCell align="center">
                                         <img
                                             src={order.items[0].image}
@@ -173,16 +169,19 @@ export default function Order() {
                                     <TableCell align="right">{order.items[0].name}</TableCell>
                                     <TableCell align="right">{order.items[0].type}</TableCell>
                                     <TableCell align="right">{order.items[0].quantity}</TableCell>
-                                    <TableCell align="right">${order.items[0].price}</TableCell>
+                                    {/* <TableCell align="right">${order.items[0].price}</TableCell> */}
                                     <TableCell align="right"></TableCell>
                                 </TableRow>
 
-                                {/* Display the remaining items in an accordion */}
                                 {order.items.length > 1 && (
                                     <TableRow>
                                         <TableCell colSpan={6} style={{ padding: 0 }}>
-                                            <Accordion style={{ width: "100%", }}>
-                                                <AccordionSummary className="accordionSummaryContent" expandIcon={<ExpandMoreIcon />} style={{ width: "100%", position: "absolute", top: "-65px", right: 0 }}>
+                                            <Accordion style={{ width: "100%" }}>
+                                                <AccordionSummary
+                                                    className="accordionSummaryContent"
+                                                    expandIcon={<ExpandMoreIcon />}
+                                                    style={{ width: "100%", position: "absolute", top: "-65px", right: 0 }}
+                                                >
                                                     <span>More</span>
                                                 </AccordionSummary>
                                                 <AccordionDetails style={{ padding: 0 }}>
@@ -217,10 +216,16 @@ export default function Order() {
                                     </TableRow>
                                 )}
                             </React.Fragment>
-                        ))}
+                        )) :
+                            <TableRow>
+                                <TableCell colSpan={6} align="center" className="!text-red-600">
+                                    {"You don't have any completed orders."}
+                                </TableCell>
+                            </TableRow>
+                        }
                     </TableBody>
                 </Table>
-            </TableContainer>
+            </TableContainer >
 
             <TablePagination
                 component="div"

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 // Define protected and unprotected routes
-export const ProtectedRoutes = ["/admin/order", "/admin/dashboard"];
+export const ProtectedRoutes = ["/admin", "/admin/orders/allorders", "/admin/orders/completeorders", "/admin/dashboard"];
 export const UnprotectedRoutes = ["/auth/signin"];
 
 // Middleware function

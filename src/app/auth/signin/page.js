@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 // import { errorMsg, successMsg } from "@/component/Toastmsg/toaster";
 import FormInput from "@/components/share/form/FormInput";
 import LocalDiningIcon from '@mui/icons-material/LocalDining';
+import { errorMsg, successMsg } from "@/components/msg/toaster";
 const Login = () => {
     const { control, handleSubmit } = useForm();
     const [error, setError] = useState(null);
@@ -31,16 +32,13 @@ const Login = () => {
             });
 
             if (res.error) {
-                setError("Invalid credentials");
-                // errorMsg("Invalid credentials");
+                errorMsg("Invalid credentials");
             } else {
-                alert("Login Successfully")
-
-                router.push("/admin/order");
+                successMsg("Login Successfully")
+                router.push("/admin/orders/allorders");
             }
         } catch (error) {
-            setError("Login Error");
-            // errorMsg("Login Error");
+            errorMsg("Login Error");
         }
     };
 

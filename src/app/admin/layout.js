@@ -21,7 +21,7 @@ export default function AdminLayout({ children }) {
                         sx={{
                             width: open ? 250 : 0, // Adjust width based on Drawer state
                             transition: "width 0.3s ease", // Smooth transition
-                            height: "100vh", // Full height
+                            // height: "100%", // Full height
                             backgroundColor: "#fdb1b182",
 
                             position: "relative",

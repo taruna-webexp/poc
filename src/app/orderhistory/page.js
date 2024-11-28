@@ -44,7 +44,9 @@ export default function OrderHistory() {
                                 <div className="mb-4 text-xl font-medium text-gray-600">
                                     <strong>Order Date:</strong> {order.date.format('YYYY-MM-DD HH:mm:ss')}
                                 </div>
-
+                                <div className="mb-4 text-l font-medium text-gray-500">
+                                    <strong>Order Number:</strong> {order.orderId}
+                                </div>
                                 {/* Items in the current order */}
                                 <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
                                     {order.items.map((item) => (

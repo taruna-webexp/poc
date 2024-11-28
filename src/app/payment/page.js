@@ -3,18 +3,39 @@
 import React, { useState, useEffect } from "react";
 import LayoutHeader from "../layoutHearTitle";
 import { useRouter } from "next/navigation";
+import { successMsg } from "@/components/msg/toaster";
 
 function Payment() {
     const [orderData, setOrderData] = useState([]);
     const [isClient, setIsClient] = useState(false); // To check if it's on the client side
     const router = useRouter();
+    const [uniqueNumber, setUniqueNumber] = useState(null);
 
+    useEffect(() => {
+        // Retrieve the current number from localStorage or initialize to 1001
+        let currentNumber = localStorage.getItem('uniqueNumber');
+        if (!currentNumber) {
+            currentNumber = 1001; // Set initial value if not already set
+        } else {
+            currentNumber = parseInt(currentNumber, 10) + 1; // Increment the number
+        }
+
+        // Save the new number to localStorage
+        localStorage.setItem('uniqueNumber', currentNumber);
+
+        // Update state to reflect the new unique number
+        setUniqueNumber(currentNumber);
+    }, []);
+
+
+    console.log("uniqueNumber", uniqueNumber)
     useEffect(() => {
         // Ensure this runs only on the client side
         setIsClient(true);
 
         const savedData = localStorage.getItem("orderplaceList");
         if (savedData) {
+            console.log("save", savedData)
             setOrderData(JSON.parse(savedData));
         }
     }, []);
@@ -32,6 +53,7 @@ function Payment() {
         const newOrder = {
 
             date: new Date().toISOString(),
+            orderId: uniqueNumber,
             items: orderData,
             chefs: chefList,
         };
@@ -40,14 +62,16 @@ function Payment() {
         const updatedOrders = [...existingOrders, newOrder];
 
         // Save back to localStorage
+        // localStorage.setItem("orderplaceList", JSON.stringify(updatedOrders));
         localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+
         localStorage.setItem("chefOrderDataList", JSON.stringify(updatedOrders));
 
 
-        alert("Thank you for your payment! Your transaction has been successfully processed.");
+        successMsg("Thank you for your payment! Your transaction has been successfully processed.");
         router.push("/orderhistory");
     };
-
+    console.log("iiiiiiiiiiii", orderData)
     return (
         <>
             <LayoutHeader pageTitle="Payment Summary" />
@@ -58,7 +82,7 @@ function Payment() {
 
                     <div className="space-y-4">
                         {orderData.length > 0 ? (
-                            orderData.map((item, index) => (
+                            orderData?.map((item, index) => (
                                 <div key={index} className="flex justify-between border-b pb-2">
                                     <div className="flex flex-col">
                                         <span className="text-gray-600 font-medium">{item.name}</span>

@@ -8,9 +8,9 @@ import FormInput from "@/components/share/form/FormInput";
 import { signIn } from "next-auth/react";
 import LocalDiningIcon from '@mui/icons-material/LocalDining';
 import LayoutHeader from "@/app/layoutHearTitle";
+import { errorMsg, successMsg } from "@/components/msg/toaster";
 const Register = () => {
   const { control, handleSubmit } = useForm();
-  const [error, setError] = useState(null);
   const router = useRouter();
 
   const onSubmit = async (data) => {
@@ -29,8 +29,7 @@ const Register = () => {
       (user) => user.email === data.email
     );
     if (emailExists) {
-      setError("Email already registered");
-      // errorMsg("Email already registered");
+      errorMsg("Email already registered");
 
       return;
     }
@@ -50,15 +49,15 @@ const Register = () => {
       });
 
       if (res?.error) {
-        setError(res.error);
-        // errorMsg(res.error);
+
+        errorMsg(res.error);
       } else {
-        // successMsg("Registeration Successfully");
-        router.push("/admin/order");
+        successMsg("Registeration Successfully");
+        router.push("/admin/orders/allorders");
       }
     } catch (err) {
       // Set the error message to be a string
-      setError(err.message || "An unexpected error occurred");
+      errorMsg(err.message || "An unexpected error occurred");
       // errorMsg(err);
     }
   };
@@ -121,7 +120,7 @@ const Register = () => {
           </Button>
         </div>
         <div className="text-center mt-6">
-          {error && <p className="text-red-500">{error}</p>}
+
           <Typography variant="body2" className="mt-2">
             You have an account?
             <Link
