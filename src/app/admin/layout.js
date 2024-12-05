@@ -23,7 +23,6 @@ export default function AdminLayout({ children }) {
                             transition: "width 0.3s ease", // Smooth transition
                             // height: "100%", // Full height
                             backgroundColor: "#fdb1b182",
-
                             position: "relative",
                             // For centering the toggle button
                         }}

@@ -109,16 +109,16 @@ export default function CompleteOrder() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
                 <Grid container spacing={2} className="align-center my-6">
-                    <Grid item xs={3} sm={4}>
+                    <Grid item xs={4} sm={4}>
                         <BasicDatePicker name="startDateRange" control={control} maxDate={endDate} />
                     </Grid>
-                    <Grid item xs={3} sm={4}>
+                    <Grid item xs={4} sm={4}>
                         <BasicDatePicker name="endDateRange" control={control} minDate={startDate} />
                     </Grid>
-                    <Grid item xs={3} sm={3}>
+                    <Grid item xs={2} sm={2}>
                         <FormInput name="orderNumber" control={control} inputType="number" placeholder="Order Id" />
                     </Grid>
-                    <Grid item xs={2} sm={1}>
+                    <Grid item xs={1} sm={1}>
                         <Button className="!mt-2 !bg-red-500 hover:!bg-red-600 text-white font-bold" type="submit" variant="contained" size="large">
                             Apply
                         </Button>
@@ -189,6 +189,8 @@ export default function CompleteOrder() {
                                                         <TableBody className="bg-red-100">
                                                             {order.items.slice(1).map((item, itemIndex) => (
                                                                 <TableRow key={itemIndex}>
+                                                                    <TableCell align="left">{order.orderId}</TableCell>
+
                                                                     <TableCell align="center">
                                                                         <img
                                                                             src={item.image}
@@ -203,8 +205,8 @@ export default function CompleteOrder() {
                                                                     </TableCell>
                                                                     <TableCell align="right">{item.name}</TableCell>
                                                                     <TableCell align="right">{item.type}</TableCell>
-                                                                    <TableCell align="right">{item.quantity}</TableCell>
-                                                                    <TableCell align="right">${item.price}</TableCell>
+                                                                    <TableCell align="center">{item.quantity}</TableCell>
+                                                                    {/* <TableCell align="right">${item.price}</TableCell> */}
                                                                     <TableCell align="right"></TableCell>
                                                                 </TableRow>
                                                             ))}

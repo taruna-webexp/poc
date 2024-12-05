@@ -117,26 +117,13 @@ const Home = () => {
 
 
 
-  //quantity  function
-  const handleQuantity = (mealId, type) => {
-    setMeals(prevMeals =>
-      prevMeals.map(meal => {
-        if (meal.id === mealId) {
-          const newQuantity = type === "icr" ? meal.quantity + 1 : Math.max(meal.quantity - 1, 1);
-          return { ...meal, quantity: newQuantity };
-        }
-        return meal;
-      })
-    );
-  };
-
 
 
   //order place function
   const placeOrderHandler = () => {
-    successMsg(`Your order has been placed! Total: $${totalPrice.toFixed(2)}`);
-
-    router.push("/payment")
+    successMsg(`Your order has been in cart`);
+    localStorage.setItem("cartDatalength", JSON.stringify(orderData))
+    window.location.replace("/cart")
     localStorage.removeItem("orderDataList")
   };
 
@@ -199,7 +186,7 @@ const Home = () => {
                   {meal.type === "veg" ? "Vegetarian" : "Non-Vegetarian"}
                 </Typography>
               </ListItemText>
-              <ListItemText>
+              {/* <ListItemText>
                 <div className="flex items-center space-x-2 mt-2">
                   <Typography variant="body2">Quantity:</Typography>
                   <Button
@@ -250,7 +237,7 @@ const Home = () => {
                     -
                   </Button>
                 </div>
-              </ListItemText>
+              </ListItemText> */}
             </ListItem>
           </List>
         ))}
@@ -272,8 +259,7 @@ const Home = () => {
           onClick={placeOrderHandler}
         >
           {orderData.length === 0
-            ? "No items in your order"
-            : `${totalPrice ? `$${totalPrice.toFixed(2)}` : ""} Place Order`}
+            ? "No items " : "Add to cart"}
         </Button>
       </Grid>
     </Grid >

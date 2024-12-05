@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import LayoutHeader from "../layoutHearTitle";
-import { List, ListItem, ListItemIcon, ListItemText, Avatar, Box, Divider } from "@mui/material";
-import dayjs from 'dayjs';
+import { List, ListItem, ListItemIcon, ListItemText, Avatar, Box } from "@mui/material";
+import dayjs from "dayjs";
+
 export default function OrderHistory() {
     const [myOrder, setMyOrder] = useState([]);
 
@@ -11,16 +12,16 @@ export default function OrderHistory() {
         // Fetch orders from localStorage
         const ordersData = JSON.parse(localStorage.getItem("myOrders")) || [];
 
-        // Ensure each order.date is parsed as a dayjs object
+        // Ensure each order.date is parsed as a dayjs object and sort by date (newest first)
         const formattedOrders = ordersData?.map(order => ({
-            ...order,
-            date: dayjs(order.date) // Parse date to dayjs
-        }));
+            ...order, date: dayjs(order.date) // Parse date to dayjs
+        }))
+            .sort((a, b) => b.date - a.date); // Sort by date in descending order
 
         setMyOrder(formattedOrders);
     }, []);
 
-    console.log("first", myOrder);
+    console.log("Sorted Orders", myOrder);
 
     return (
         <>
@@ -36,13 +37,12 @@ export default function OrderHistory() {
                         margin: "0 auto",
                     }}
                 >
-                    <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">Order History</h2>
                     <List>
                         {myOrder.map((order, index) => (
                             <div key={index} className="mb-8 shadow-xl pb-4">
                                 {/* Displaying Order Date */}
                                 <div className="mb-4 text-xl font-medium text-gray-600">
-                                    <strong>Order Date:</strong> {order.date.format('YYYY-MM-DD HH:mm:ss')}
+                                    <strong>Order Date:</strong> {order.date.format("YYYY-MM-DD HH:mm:ss")}
                                 </div>
                                 <div className="mb-4 text-l font-medium text-gray-500">
                                     <strong>Order Number:</strong> {order.orderId}
@@ -60,18 +60,18 @@ export default function OrderHistory() {
                                                 }
                                                 secondary={
                                                     <span className="text-gray-500 text-sm">
-                                                        Type: <span className="font-medium">{item.type}</span> | Price: <span className="font-medium">${item.price}</span> | Quantity: <span className="font-medium">{item.quantity}</span>
+                                                        Type: <span className="font-medium">{item.type}</span> | Price:{" "}
+                                                        <span className="font-medium">${item.price}</span> | Quantity:{" "}
+                                                        <span className="font-medium">{item.quantity}</span>
                                                     </span>
                                                 }
                                             />
                                         </ListItem>
                                     ))}
                                 </div>
-                                {/* <Divider sx={{ borderBottom: '2px solid #333', marginY: 2 }} /> */}
                             </div>
                         ))}
                     </List>
-
                 </Box>
             ) : (
                 <p className="text-center text-xl text-gray-600 mt-6">No orders found.</p>

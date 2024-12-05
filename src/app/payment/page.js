@@ -15,7 +15,7 @@ function Payment() {
         // Retrieve the current number from localStorage or initialize to 1001
         let currentNumber = localStorage.getItem('uniqueNumber');
         if (!currentNumber) {
-            currentNumber = 1001; // Set initial value if not already set
+            currentNumber = 1000; // Set initial value if not already set
         } else {
             currentNumber = parseInt(currentNumber, 10) + 1; // Increment the number
         }
@@ -67,9 +67,10 @@ function Payment() {
 
         localStorage.setItem("chefOrderDataList", JSON.stringify(updatedOrders));
 
+        localStorage.removeItem("cartDatalength");
 
         successMsg("Thank you for your payment! Your transaction has been successfully processed.");
-        router.push("/orderhistory");
+        window.location.replace("/orderhistory");
     };
     console.log("iiiiiiiiiiii", orderData)
     return (
