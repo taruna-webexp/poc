@@ -61,7 +61,7 @@ const Login = () => {
                         <LocalDiningIcon fontSize="large" /> Food Prepation
                     </Typography>
                     <Typography variant="body2" className="text-gray-600">
-                        Sign in to continue.
+                        Sign in as a cook to continue.
                     </Typography>
                 </div>
 

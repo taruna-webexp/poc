@@ -21,7 +21,6 @@ export default function OrderHistory() {
         setMyOrder(formattedOrders);
     }, []);
 
-    console.log("Sorted Orders", myOrder);
 
     return (
         <>
@@ -40,15 +39,16 @@ export default function OrderHistory() {
                     <List>
                         {myOrder.map((order, index) => (
                             <div key={index} className="mb-8 shadow-xl pb-4">
-                                {/* Displaying Order Date */}
-                                <div className="mb-4 text-xl font-medium text-gray-600">
-                                    <strong>Order Date:</strong> {order.date.format("YYYY-MM-DD HH:mm:ss")}
-                                </div>
-                                <div className="mb-4 text-l font-medium text-gray-500">
-                                    <strong>Order Number:</strong> {order.orderId}
-                                </div>
+
+
                                 {/* Items in the current order */}
-                                <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
+                                <div className="bg-red-100 p-4 rounded-lg shadow-sm mb-4">
+                                    <div className="mb-4 text-xl font-medium text-gray-600">
+                                        <strong>Order Date:</strong> {order.date.format("YYYY-MM-DD HH:mm:ss")}
+                                    </div>
+                                    <div className="mb-4 text-l font-medium text-gray-500">
+                                        <strong>Order Number:</strong> {order.orderId}
+                                    </div>
                                     {order.items.map((item) => (
                                         <ListItem key={item.id} disablePadding className="py-4">
                                             <ListItemIcon>

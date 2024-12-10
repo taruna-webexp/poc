@@ -13,27 +13,30 @@ const Home = () => {
   const { control, handleSubmit, setValue } = useForm();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectedCategories, setSelectedCategories] = useState(["veg", "non"]);
   const [mealCategoryValue, setMealCategoryValue] = useState(null)
-  useEffect(() => {
-    // Ensure searchParams is accessed only on the client side
-    const category = searchParams.get("category");
-    setMealCategoryValue(category);
-  }, [searchParams]); // Update when
   const [meals, setMeals] = useState(initialMeals);
   const [orderData, setOrderData] = useState(() => {
     const savedData = localStorage.getItem("orderDataList");
     return savedData ? JSON.parse(savedData) : [];
   });
-  const [totalPrice, setTotalPrice] = useState(0);
 
-  const [check, setCheck] = useState(true)
-  const [selectedCategories, setSelectedCategories] = useState(["veg", "non"]);
-  console.log("selected", selectedCategories)
+  //Meal category options
+  const mealCategoryOptions = [
+    { id: 1, value: "veg", label: "Veg" },
+    { id: 2, value: "non", label: "Non-Veg" },
+  ];
+
+  useEffect(() => {
+    // Ensure searchParams is accessed only on the client side
+    const category = searchParams.get("category");
+    setMealCategoryValue(category);
+  }, [searchParams]); // Update when
+
   // Handle checkbox changes
   const handleChangeCategory = (e, option) => {
     const isChecked = e.target.checked;
     let updatedCategories;
-
     if (isChecked) {
       // Add the selected option to the list
       updatedCategories = [...selectedCategories, option.value];
@@ -48,16 +51,13 @@ const Home = () => {
         updatedCategories = [otherOption.value];
       }
     }
-
     setSelectedCategories(updatedCategories);
-
     if (updatedCategories.length > 0) {
       // Update the URL query params
       const queryParams = updatedCategories.join(",");
       router.push(`/?category=${queryParams}`);
     }
   };
-
 
   // Filter meals based on selected categories
   useEffect(() => {
@@ -68,19 +68,7 @@ const Home = () => {
     }
   }, [selectedCategories]);
 
-  const mealCategoryOptions = [
-    { id: 1, value: "veg", label: "Veg" },
-    { id: 2, value: "non", label: "Non-Veg" },
-  ];
 
-  useEffect(() => {
-    // Update total price whenever orderData changes
-    const calculateTotalPrice = () => {
-      const total = orderData?.reduce((total, item) => total + item.price * item.quantity, 0);
-      setTotalPrice(total);
-    };
-    calculateTotalPrice();
-  }, [orderData]);
 
   //urlquery condition data
   useEffect(() => {
@@ -102,23 +90,10 @@ const Home = () => {
     const updatedOrderData = isAlreadyInOrder
       ? orderData.filter(orderItem => orderItem.id !== meal.id) // Remove
       : [...orderData, meal]; // Add
-
     setOrderData(updatedOrderData);
-    const newOrderData = {
-      date: new Date().toISOString(),
-      items: updatedOrderData,
-    };
-
-
     localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
-
     localStorage.setItem("orderplaceList", JSON.stringify(updatedOrderData));
   };
-
-
-
-
-
   //order place function
   const placeOrderHandler = () => {
     successMsg(`Your order has been in cart`);
@@ -126,8 +101,6 @@ const Home = () => {
     window.location.replace("/cart")
     localStorage.removeItem("orderDataList")
   };
-
-
 
   return (<>
     <Grid container maxWidth="lg" spacing={2} className=" home-container mt-4" >
@@ -151,14 +124,12 @@ const Home = () => {
               selectedCategories={selectedCategories}
             />
           </div>
-
         </form>
       </Grid>
 
-
       <Grid item xs={12} sm={12} md={12}>
         {meals.map(meal => (
-          <List sx={{ borderRadius: 2, boxShadow: 1 }} key={meal.id}>
+          <List sx={{ borderRadius: 2, boxShadow: 1 }} key={meal.id} className="">
             <ListItem>
               <ListItemAvatar>
                 <CheckboxGroup

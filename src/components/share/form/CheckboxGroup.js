@@ -4,7 +4,6 @@ import React from "react";
 import { Controller } from "react-hook-form";
 
 const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, handleChangeCategory, selectedCategories }) => {
-    console.log("selectedCategories11111", selectedCategories)
     return (
         <>
             {options.map((option) => (

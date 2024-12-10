@@ -23,11 +23,7 @@ export default function TemporaryDrawer({ open, setOpen }) {
     const session = useSession();
 
     const adminPageUrl = [
-        {
-            text: "Dashboard", href: "/admin/dashboard", icon: <DashboardIcon />
-
-
-        },
+        { text: "Dashboard", href: "/admin/dashboard", icon: <DashboardIcon /> },
         {
             text: "Orders",
             icon: <FastfoodIcon />,
@@ -46,6 +42,7 @@ export default function TemporaryDrawer({ open, setOpen }) {
             setExpandedItem(1); // Expand the "Orders" section (index 1 in adminPageUrl)
         }
     }, [currentPath]);
+
     const handleClick = (item) => {
         setExpandedItem((prev) => (prev === item ? null : item));
     };

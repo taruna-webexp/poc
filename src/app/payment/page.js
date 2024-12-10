@@ -2,14 +2,31 @@
 
 import React, { useState, useEffect } from "react";
 import LayoutHeader from "../layoutHearTitle";
-import { useRouter } from "next/navigation";
 import { successMsg } from "@/components/msg/toaster";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function Payment() {
     const [orderData, setOrderData] = useState([]);
     const [isClient, setIsClient] = useState(false); // To check if it's on the client side
-    const router = useRouter();
     const [uniqueNumber, setUniqueNumber] = useState(null);
+    const [chefs, setChef] = useState([]);
+    const [orderUpdateData, setOrderUpdateData] = useState([]);
+
+
+
+
+
+
+
+
+
+
+
+    useEffect(() => {
+        const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
+        setChef(chefList);
+    }, [])
 
     useEffect(() => {
         // Retrieve the current number from localStorage or initialize to 1001
@@ -20,19 +37,14 @@ function Payment() {
             currentNumber = parseInt(currentNumber, 10) + 1; // Increment the number
         }
 
-        // Save the new number to localStorage
-        localStorage.setItem('uniqueNumber', currentNumber);
-
-        // Update state to reflect the new unique number
-        setUniqueNumber(currentNumber);
+        localStorage.setItem('uniqueNumber', currentNumber);  // Save the new number to localStorage
+        setUniqueNumber(currentNumber);    // Update state to reflect the new unique number
     }, []);
 
 
-    console.log("uniqueNumber", uniqueNumber)
     useEffect(() => {
         // Ensure this runs only on the client side
         setIsClient(true);
-
         const savedData = localStorage.getItem("orderplaceList");
         if (savedData) {
             console.log("save", savedData)
@@ -51,28 +63,50 @@ function Payment() {
 
         // Create a new order structure with a single date
         const newOrder = {
-
             date: new Date().toISOString(),
             orderId: uniqueNumber,
             items: orderData,
-            chefs: chefList,
+
         };
 
         // Combine new and existing orders
         const updatedOrders = [...existingOrders, newOrder];
-
+        setOrderUpdateData(updatedOrders)
         // Save back to localStorage
-        // localStorage.setItem("orderplaceList", JSON.stringify(updatedOrders));
         localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
-
         localStorage.setItem("chefOrderDataList", JSON.stringify(updatedOrders));
-
         localStorage.removeItem("cartDatalength");
-
         successMsg("Thank you for your payment! Your transaction has been successfully processed.");
         window.location.replace("/orderhistory");
     };
-    console.log("iiiiiiiiiiii", orderData)
+
+    // Initialize an empty object to store the assignments
+    const assignments = chefs.reduce((acc, chef) => {
+        console.log("acc", acc, chef)
+        if (chef.email) {
+            acc[chef.email] = []; // Ensure each chef has an array for orders
+        }
+        console.log("acc2", acc)
+
+        return acc;
+    }, {});
+    console.log("assignments", assignments)
+    const myOrderUpdate = JSON.parse(localStorage.getItem("myOrders"));
+    // // Distribute the orders
+    myOrderUpdate?.forEach((order, index) => {
+
+        const chefIndex = index % chefs.length; //v Determines which chef gets the order
+        console.log("chefIndex", chefIndex)
+        const chefEmail = chefs[chefIndex]?.email; // Safely access the chef's email
+        console.log("chefEmail", chefEmail)
+
+        if (chefEmail) {
+            assignments[chefEmail].push(order); // Assign order to the chef
+        }
+        localStorage.setItem("particularChefOrder", JSON.stringify(assignments))
+    });
+
+    console.log("asss", assignments)
     return (
         <>
             <LayoutHeader pageTitle="Payment Summary" />
@@ -80,7 +114,6 @@ function Payment() {
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
                     <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Payment Summary</h2>
-
                     <div className="space-y-4">
                         {orderData.length > 0 ? (
                             orderData?.map((item, index) => (

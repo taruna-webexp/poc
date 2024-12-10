@@ -5,11 +5,9 @@ import { Controller } from "react-hook-form";
 export default function FormInput({
     name,
     control,
-    errors,
     label,
     inputType,
     className,
-    defaultValue,
     placeholder,
 }) {
     return (
@@ -27,8 +25,6 @@ export default function FormInput({
                         label={label}
                         placeholder={placeholder}
                         type={inputType}
-                        // error={!!errors[name]}
-                        // helperText={errors[name]?.message}
                         variant="outlined"
                     />
                 )}

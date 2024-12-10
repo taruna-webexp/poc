@@ -25,3 +25,6 @@
 .accordionSummaryContent .MuiAccordionSummary-content {
   justify-content: end;
 }
+.card-order-images {
+  height: 92px;
+}

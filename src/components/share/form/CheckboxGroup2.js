@@ -23,7 +23,6 @@ const CheckboxGroup2 = ({ name, options, control, setValue, toggleOrderItem }) =
                 control={control}
                 defaultValue={false}
                 render={({ field }) => {
-                    console.log("field", field)
                     return (
                         <>
                             <input
@@ -34,7 +33,6 @@ const CheckboxGroup2 = ({ name, options, control, setValue, toggleOrderItem }) =
                                     field.onChange(e.target.checked);
                                     toggleOrderItem(option);
                                 }}
-                            // className="hidden"
                             />
 
                             <img

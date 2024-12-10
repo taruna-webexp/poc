@@ -14,7 +14,6 @@ export async function middleware(request) {
   const isProtectedRoute = ProtectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
-  console.log("isProtectedRoute", isProtectedRoute)
   // Check if the route is unprotected
   const isUnprotectedRoute = UnprotectedRoutes.some((route) =>
     pathname.startsWith(route)

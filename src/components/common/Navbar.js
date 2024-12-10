@@ -1,27 +1,24 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Badge from "@mui/material/Badge";
+import { Button } from "@mui/material";
 
 const Navbar = ({ open, setOpen }) => {
     const { data: session } = useSession();
     const router = useRouter();
     const currentPath = usePathname();
     const isCurrentPath = currentPath.startsWith("/admin") || currentPath.startsWith("/auth");
-
     const [cartData, setCartData] = useState([]);
 
-    // Load cart data from localStorage
     useEffect(() => {
-        const storedCartData = localStorage.getItem("cartDatalength");
-        if (storedCartData) {
-            setCartData(JSON.parse(storedCartData));
-        }
-    }, []);
+        const storedCartData = JSON.parse(localStorage.getItem("cartDatalength"));
+        setCartData(storedCartData);
+    }, []); // `cartData` as a dependency
 
     const orderItem = cartData?.length > 0 ? cartData.length : "0";
 
@@ -94,7 +91,7 @@ const Navbar = ({ open, setOpen }) => {
                             </Link>
                         </div>
 
-                        <div className="flex gap-6">
+                        <div className="flex gap-12 justify-center items-center">
                             <Link href="/" className="hover:text-gray-300">
                                 Menu
                             </Link>
@@ -103,7 +100,15 @@ const Navbar = ({ open, setOpen }) => {
                                     <ShoppingBasketIcon />
                                 </Badge>
                             </Link>
+                            <Button className="!bg-white !text-green-500 font-semibold py-2 px-4 rounded hover:!bg-green-700 hover:!text-white transition duration-200">
+                                <Link href="/auth/signin" className="hover:text-gray-300">
+                                    Login as a chef
+                                </Link>
+                            </Button>
+
                         </div>
+
+
                     </div>
                 </nav>
             )}
