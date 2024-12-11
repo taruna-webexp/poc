@@ -1,62 +1,60 @@
 "use client";
 
-import CheckboxGroup from "@/components/share/form/CheckboxGroup";
-import { meals as initialMeals } from "@/service/mealData";
-import { Button, Grid, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import LayoutHeader from "./layoutHearTitle";
+import { Button, Grid, Typography, List, ListItem, ListItemText, ListItemAvatar } from "@mui/material";
 import { successMsg } from "@/components/msg/toaster";
+import LayoutHeader from "./layoutHearTitle";
+import { meals as initialMeals } from "@/service/mealData";
+import CheckboxGroup from "@/components/share/form/CheckboxGroup";
 
 const Home = () => {
   const { control, handleSubmit, setValue } = useForm();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [selectedCategories, setSelectedCategories] = useState(["veg", "non"]);
-  const [mealCategoryValue, setMealCategoryValue] = useState(null)
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [mealCategoryValue, setMealCategoryValue] = useState(null);
   const [meals, setMeals] = useState(initialMeals);
-  const [orderData, setOrderData] = useState(() => {
-    const savedData = localStorage.getItem("orderDataList");
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  const [orderData, setOrderData] = useState([]);
+  const [isClient, setIsClient] = useState(false);
 
-  //Meal category options
+  // Meal category options
   const mealCategoryOptions = [
     { id: 1, value: "veg", label: "Veg" },
     { id: 2, value: "non", label: "Non-Veg" },
   ];
 
+  // Ensure client-side checks for localStorage usage
   useEffect(() => {
-    // Ensure searchParams is accessed only on the client side
-    const category = searchParams.get("category");
-    setMealCategoryValue(category);
-  }, [searchParams]); // Update when
+    setIsClient(true);
+  }, []);
 
-  // Handle checkbox changes
+  // Get query parameter from URL on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get("category"); // Access category from query parameters
+    if (category) {
+      const categories = category.split(",");
+      setMealCategoryValue(category);
+      setSelectedCategories(categories);
+    }
+  }, []); // This effect runs only once on component mount
+
+  // Handle category change and update URL query parameter
   const handleChangeCategory = (e, option) => {
     const isChecked = e.target.checked;
-    let updatedCategories;
-    if (isChecked) {
-      // Add the selected option to the list
-      updatedCategories = [...selectedCategories, option.value];
-    } else {
-      // Remove the unselected option from the list
-      updatedCategories = selectedCategories.filter((cat) => cat !== option.value);
+    let updatedCategories = [...selectedCategories];
 
-      // If no categories are selected, automatically select the other option
-      if (updatedCategories.length === 0) {
-        const otherOption = mealCategoryOptions.find((opt) => opt.value !== option.value);
-        console.log("otherOption", otherOption)
-        updatedCategories = [otherOption.value];
-      }
+    if (isChecked) {
+      updatedCategories.push(option.value);
+    } else {
+      updatedCategories = updatedCategories.filter((cat) => cat !== option.value);
     }
+
     setSelectedCategories(updatedCategories);
-    if (updatedCategories.length > 0) {
-      // Update the URL query params
-      const queryParams = updatedCategories.join(",");
-      router.push(`/?category=${queryParams}`);
-    }
+
+    // Update the query parameter in the URL
+    const updatedQuery = updatedCategories.length > 0 ? updatedCategories.join(",") : "";
+    const newUrl = `${window.location.pathname}?category=${updatedQuery}`;
+    window.history.pushState({ path: newUrl }, "", newUrl); // Update URL without reloading the page
   };
 
   // Filter meals based on selected categories
@@ -69,21 +67,6 @@ const Home = () => {
   }, [selectedCategories]);
 
 
-
-  //urlquery condition data
-  useEffect(() => {
-    if (mealCategoryValue) {
-      const categories = mealCategoryValue.split(",");
-      if (categories.includes("veg") && categories.includes("non")) {
-        setMeals(initialMeals); // Show all meals
-      } else {
-        setMeals(initialMeals.filter(meal => categories.includes(meal.type)));
-      }
-    } else {
-      setMeals(initialMeals); // Show all meals by default
-    }
-  }, [mealCategoryValue]);
-
   //item select toggel
   const toggleOrderItem = (meal) => {
     const isAlreadyInOrder = orderData.some(orderItem => orderItem.id === meal.id);
@@ -91,25 +74,31 @@ const Home = () => {
       ? orderData.filter(orderItem => orderItem.id !== meal.id) // Remove
       : [...orderData, meal]; // Add
     setOrderData(updatedOrderData);
-    localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
-    localStorage.setItem("orderplaceList", JSON.stringify(updatedOrderData));
-  };
-  //order place function
-  const placeOrderHandler = () => {
-    successMsg(`Your order has been in cart`);
-    localStorage.setItem("cartDatalength", JSON.stringify(orderData))
-    window.location.replace("/cart")
-    localStorage.removeItem("orderDataList")
+    if (isClient) {
+      localStorage.setItem("orderDataList", JSON.stringify(updatedOrderData));
+      localStorage.setItem("orderplaceList", JSON.stringify(updatedOrderData));
+    }
   };
 
-  return (<>
-    <Grid container maxWidth="lg" spacing={2} className=" home-container mt-4" >
+
+
+
+
+  // Place order handler
+  const placeOrderHandler = () => {
+    successMsg(`Your order has been added to the cart`);
+    if (isClient) {
+      localStorage.setItem("cartDatalength", JSON.stringify(orderData));
+      window.location.replace("/cart");
+      localStorage.removeItem("orderDataList");
+    }
+  };
+
+  return (
+    <Grid container maxWidth="lg" spacing={2} className="home-container mt-4">
       <LayoutHeader pageTitle="All Menu Items" />
       <Grid item xs={12}>
-        <form
-          onSubmit={handleSubmit(() => { })}
-          className="bg-gradient-to-br from-gray-100 to-gray-300 shadow-xl rounded-lg p-6 "
-        >
+        <form onSubmit={handleSubmit(() => { })} className="bg-gradient-to-br from-gray-100 to-gray-300 shadow-xl rounded-lg p-6">
           <Typography variant="h4" align="center" className="text-gray-800 font-bold mb-2">
             Choose Your Meal Category
           </Typography>
@@ -129,7 +118,7 @@ const Home = () => {
 
       <Grid item xs={12} sm={12} md={12}>
         {meals.map(meal => (
-          <List sx={{ borderRadius: 2, boxShadow: 1 }} key={meal.id} className="">
+          <List sx={{ borderRadius: 2, boxShadow: 1 }} key={meal.id}>
             <ListItem>
               <ListItemAvatar>
                 <CheckboxGroup
@@ -141,6 +130,8 @@ const Home = () => {
                     toggleOrderItem(meal);
                   }}
                 />
+
+
               </ListItemAvatar>
               <ListItemText>
                 <Typography variant="h6" component="div" noWrap>
@@ -157,62 +148,11 @@ const Home = () => {
                   {meal.type === "veg" ? "Vegetarian" : "Non-Vegetarian"}
                 </Typography>
               </ListItemText>
-              {/* <ListItemText>
-                <div className="flex items-center space-x-2 mt-2">
-                  <Typography variant="body2">Quantity:</Typography>
-                  <Button
-                    onClick={() => handleQuantity(meal.id, "icr")}
-                    sx={{
-                      minWidth: 24,
-                      height: 24,
-                      padding: 0,
-                      backgroundColor: '#4caf50',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      '&:hover': { backgroundColor: '#388e3c' }
-                    }}
-                  >
-                    +
-                  </Button>
-                  <input
-                    type="number"
-                    value={meal.quantity}
-                    onChange={(e) =>
-                      setMeals(prevMeals =>
-                        prevMeals.map(m =>
-                          m.id === meal.id ? { ...m, quantity: Math.max(Number(e.target.value), 1) } : m
-                        )
-                      )
-                    }
-                    style={{
-                      width: '40px',
-                      textAlign: 'center',
-                      fontSize: '14px',
-                      padding: '5px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                    }}
-                  />
-                  <Button
-                    onClick={() => handleQuantity(meal.id, "dec")}
-                    sx={{
-                      minWidth: 24,
-                      height: 24,
-                      padding: 0,
-                      backgroundColor: '#f44336',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      '&:hover': { backgroundColor: '#d32f2f' }
-                    }}
-                  >
-                    -
-                  </Button>
-                </div>
-              </ListItemText> */}
             </ListItem>
           </List>
         ))}
       </Grid>
+
       <Grid className="order-button-container mt-4 w-full">
         <Button
           variant="contained"
@@ -229,12 +169,10 @@ const Home = () => {
           }}
           onClick={placeOrderHandler}
         >
-          {orderData.length === 0
-            ? "No items " : "Add to cart"}
+          {orderData.length === 0 ? "No items" : "Add to cart"}
         </Button>
       </Grid>
-    </Grid >
-  </>
+    </Grid>
   );
 };
 

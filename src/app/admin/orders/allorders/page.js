@@ -36,11 +36,15 @@ import { useRouter } from "next/navigation";
 
 export default function AllOrder() {
 
+    const [isClient, setIsClient] = useState(false);
 
     const { data: session, status } = useSession();
     const [currentChef, setCurrentChef] = useState();
     const router = useRouter();
-
+    // Ensure client-side checks for localStorage usage
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     useEffect(() => {
         if (status === "loading") {
             console.log("Session is loading...");
@@ -55,23 +59,7 @@ export default function AllOrder() {
         }
     }, [status, session, router]);
 
-    console.log("currentChef", currentChef)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    console.log("currentChef", currentChef)
     const today = dayjs();
 
     const { control, handleSubmit, watch } = useForm({
@@ -86,7 +74,7 @@ export default function AllOrder() {
 
     // useEffect hook to load data from local storage on initial render
     const [columns, setColumns] = useState(() => {
-        const savedData = JSON.parse(localStorage.getItem("dragDropData"))
+        const savedData = isClient && JSON.parse(localStorage.getItem("dragDropData"))
         return savedData ? savedData
             :
             {
