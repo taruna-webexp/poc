@@ -74,7 +74,7 @@ export default function AllOrder() {
 
     // useEffect hook to load data from local storage on initial render
     const [columns, setColumns] = useState(() => {
-        const savedData = isClient && JSON.parse(localStorage.getItem("dragDropData"))
+        const savedData = JSON.parse(localStorage.getItem("dragDropData"))
         return savedData ? savedData
             :
             {
