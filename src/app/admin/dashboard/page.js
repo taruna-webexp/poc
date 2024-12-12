@@ -8,23 +8,26 @@ import SoupKitchenIcon from '@mui/icons-material/SoupKitchen';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import BarChart from '@/components/dashboard/chart/BarChart';
 
 const Assignments = () => {
     const [chefs, setChefs] = useState([]);
     const [complete, setComplete] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [allData, setAllData] = useState([]);
+    const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
-
-
         const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
+        console.log("chefList:", chefList);
         setChefs(chefList);
 
-        const completeData = JSON.parse(localStorage.getItem("dragDropData")) || [];
-        setComplete(completeData.completeOrder);
-
+        const completeData = JSON.parse(localStorage.getItem("dragDropData")) || {};
+        console.log("completeData:", completeData);
+        setComplete(completeData.delivered || []);
+        setChartData(completeData)
         const data = JSON.parse(localStorage.getItem("chefOrderDataList")) || [];
+        console.log("chefOrderDataList:", data);
         const formattedOrders = data.map(({ date, ...rest }) => ({
             ...rest,
             date: dayjs(date).format("YYYY-MM-DD"),
@@ -36,7 +39,7 @@ const Assignments = () => {
     const today = dayjs().format("YYYY-MM-DD");
     const todayOrdersCount = filteredData.filter((item) => item.date === today).length;
     const allOrdersCount = allData.length;
-    const completedOrderCount = complete.length;
+    const deliveredOrderCount = complete.length;
 
     return (
         <>
@@ -55,8 +58,8 @@ const Assignments = () => {
                     },
                     {
                         icon: <SoupKitchenIcon className="!text-7xl" />,
-                        label: "Complete",
-                        value: completedOrderCount,
+                        label: "Delivered",
+                        value: deliveredOrderCount,
                     },
                 ].map((item, index) => (
                     <Grid item xs={4} key={index}>
@@ -72,6 +75,9 @@ const Assignments = () => {
                         </Box>
                     </Grid>
                 ))}
+            </Grid>
+            <Grid container spacing={2} className="!my-12 justify-center">
+                <BarChart data={chartData} />
             </Grid>
         </>
     );

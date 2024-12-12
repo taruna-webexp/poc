@@ -61,7 +61,7 @@ export default function AllOrder() {
 
     const { control, handleSubmit, watch } = useForm({
         defaultValues: {
-            startDateRange: today.subtract(1, "month"),
+            startDateRange: today,
             endDateRange: today,
         },
     });
@@ -72,14 +72,16 @@ export default function AllOrder() {
     // useEffect hook to load data from local storage on initial render
     const [columns, setColumns] = useState({
         allOrders: [],
-        inProgress: [],
-        completeOrder: [],
+        preparing: [],
+
+        delivered: [],
     });
 
     useEffect(() => {
         if (typeof window !== "undefined") {
             const savedData = JSON.parse(localStorage.getItem("dragDropData"));
             if (savedData) {
+                // Sort data in descending order by `id`
                 setColumns(savedData);
             }
         }
@@ -89,7 +91,6 @@ export default function AllOrder() {
     useEffect(() => {
         // Check if `newChefOrderDataList` already exists in localStorage
         const storedData = JSON.parse(localStorage.getItem('particularChefOrder'));
-        const newChefOrderDataList = localStorage.getItem('newChefOrderDataList');
         const storedLoginChef = localStorage.getItem("loginChef")
         if (storedData) {
             try {
@@ -109,27 +110,27 @@ export default function AllOrder() {
                     }));
 
                     setColumns((prev) => {
-                        const inProgressIds = prev.inProgress.map(order => order.id);
-                        const completeOrderIds = prev.completeOrder.map(order => order.id);
+                        const preparingIds = prev.preparing.map(order => order.id);
+                        const deliveredIds = prev.delivered.map(order => order.id);
 
                         return {
                             ...prev,
-                            allOrders: formattedOrders
-                                .filter(order => !inProgressIds.includes(order.orderId) && !completeOrderIds.includes(order.orderId))
+                            allOrders: formattedOrders.sort((a, b) => b.id - a.id)
+                                .filter(order => !preparingIds.includes(order.orderId) && !deliveredIds.includes(order.orderId))
                                 .map(order => ({
                                     id: order.orderId,
                                     date: order.date,
                                     items: order.items,
                                 })),
-                            inProgress: prev.inProgress,
-                            completeOrder: prev.completeOrder
+                            preparing: prev.preparing,
+                            delivered: prev.delivered
                         };
                     });
                 } else {
                     setColumns({
                         allOrders: [],
-                        inProgress: [],
-                        completeOrder: []
+                        preparing: [],
+                        delivered: []
                     })
                     // localStorage.setItem('newChefOrderDataList', JSON.stringify([]));
 
@@ -255,7 +256,7 @@ export default function AllOrder() {
                 style={{ ...style, cursor: "grab" }}
                 {...listeners}
                 {...attributes}
-                className="p-2 border rounded mb-2 bg-white shadow grid justify-center"
+                className="p-2 border  rounded  shadow-md grid justify-center"
             >
                 {children}
             </div>
@@ -312,60 +313,54 @@ export default function AllOrder() {
                                 <h3 className="text-lg font-bold capitalize text-center text-white">{columnId}</h3></div>
                             <Droppable id={columnId}>
                                 {columns[columnId].map((task) => (
-                                    <Draggable key={task.id} id={task.id} >
+                                    <Draggable key={task.id} id={task.id} className="" >
                                         {/* Display each task as a Material-UI Card */}
-                                        <Card sx={{ width: 200, marginBottom: 2, }}>
-                                            <Typography>
+                                        <Card sx={{ width: 400, bgcolor: "#dcdcdc;", padding: 2, border: "1px solid #b6b6b6" }}>
+                                            <Typography >
                                                 {`Order ID: ${task.id}`}
                                             </Typography>
-                                            <CardMedia
-                                                className="card-order-images"
-                                                component="img"
 
-                                                image={task?.items[0]?.image || "/default-image.jpg"}
-                                            />
-                                            <CardContent>
-                                                <Typography variant="p">
+                                            <CardContent className="grid">
+                                                <Typography variant="p" className="text-2xl">
                                                     {task?.items[0]?.name}
                                                 </Typography>
-                                                <div className="flex gap-4">
+
+                                                <div className="flex gap-4 py-2">
                                                     <Typography variant="body2">
                                                         Quantity: {task?.items[0]?.quantity}
                                                     </Typography>
-
-                                                    <Typography className="text-gray-500" variant="body2">
-                                                        {task.date}
+                                                    <Typography variant="body2">
+                                                        Type:  {task?.items[0]?.type}
                                                     </Typography>
+
                                                 </div>
+                                                <Typography className="text-gray-500" variant="body2">
+                                                    {task.date}
+                                                </Typography>
                                             </CardContent>
-
-
 
                                             {/* Accordion for additional item details */}
                                             {task?.items?.length > 1 && (
                                                 <Accordion>
-                                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} onPointerDown={(e) => e.stopPropagation()}>
-                                                        <Typography>More items</Typography>
-                                                    </AccordionSummary>
-                                                    <AccordionDetails>
+                                                    <AccordionSummary className="" expandIcon={<ExpandMoreIcon />} onPointerDown={(e) => e.stopPropagation()} >
+                                                        More
+                                                    </AccordionSummary >
+
+                                                    <AccordionDetails className="!p-0">
                                                         {task?.items?.slice(1)?.map((item, index) => (
                                                             <div key={index} className=" items-center gap-2">
-                                                                <CardMedia
-                                                                    className="card-order-images"
 
-                                                                    component="img"
-                                                                    height="40"
-                                                                    image={item.image || "/default-image.jpg"}
-                                                                />
-                                                                <CardContent>
-                                                                    <Typography variant="p">
+                                                                <CardContent className="mb-2" sx={{ bgcolor: "#dcdcdc;", }}>
+                                                                    <Typography variant="p" className="">
                                                                         {item.name}
                                                                     </Typography>
                                                                     <div className="flex gap-2">
                                                                         <Typography variant="body2">
                                                                             Quantity: {item.quantity}
                                                                         </Typography>
-
+                                                                        <Typography variant="body2">
+                                                                            Type: {item.type}
+                                                                        </Typography>
                                                                     </div>
                                                                 </CardContent>
                                                             </div>

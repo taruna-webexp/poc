@@ -117,40 +117,37 @@ const Home = () => {
       </Grid>
 
       <Grid item xs={12} sm={12} md={12}>
-        {meals.map(meal => (
-          <List sx={{ borderRadius: 2, boxShadow: 1 }} key={meal.id}>
-            <ListItem>
-              <ListItemAvatar>
-                <CheckboxGroup
-                  name={meal.name}
-                  options={[meal]}
-                  control={control}
-                  setValue={(name, value) => {
-                    setValue(name, value);
-                    toggleOrderItem(meal);
-                  }}
-                />
+        <Grid container spacing={2}>
+          {meals.map((meal) => (
+            <Grid item xs={12} sm={6} md={4} key={meal.id}>
+              <List sx={{ borderRadius: 2, boxShadow: 1, overflow: 'hidden' }}>
+                <ListItem>
+                  <div style={{ textAlign: 'center' }}>
 
-
-              </ListItemAvatar>
-              <ListItemText>
-                <Typography variant="h6" component="div" noWrap>
-                  {meal.name}
-                </Typography>
-              </ListItemText>
-              <ListItemText>
-                <Typography variant="h6" component="div" noWrap>
-                  ${meal.price}
-                </Typography>
-              </ListItemText>
-              <ListItemText>
-                <Typography variant="h6" component="div" noWrap>
-                  {meal.type === "veg" ? "Vegetarian" : "Non-Vegetarian"}
-                </Typography>
-              </ListItemText>
-            </ListItem>
-          </List>
-        ))}
+                    <CheckboxGroup
+                      name={meal.name}
+                      options={[meal]}
+                      control={control}
+                      setValue={(name, value) => {
+                        setValue(name, value);
+                        toggleOrderItem(meal);
+                      }}
+                    />
+                    <Typography variant="h6" component="div">
+                      {meal.name}
+                    </Typography>
+                    <Typography variant="h6" component="div">
+                      ${meal.price}
+                    </Typography>
+                    <Typography variant="h6" component="div">
+                      {meal.type === "veg" ? "Vegetarian" : "Non-Vegetarian"}
+                    </Typography>
+                  </div>
+                </ListItem>
+              </List>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
 
       <Grid className="order-button-container mt-4 w-full">
@@ -173,6 +170,7 @@ const Home = () => {
         </Button>
       </Grid>
     </Grid>
+
   );
 };
 

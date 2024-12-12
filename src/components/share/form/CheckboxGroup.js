@@ -40,7 +40,7 @@ const CheckboxGroup = ({ name, options, control, setValue, toggleOrderItem, hand
                                                 setValue(`${name}.${option.value}`, !field.value);
                                             }
                                         }}
-                                        width="35%"
+                                        width="45%"
                                         className={`object-cover rounded-md shadow-md mb-2 cursor-pointer ${field.value && name !== "mealCategory" ? "ring-8 ring-green-500 ring-offset-4" : ""
                                             }`}
                                     />
