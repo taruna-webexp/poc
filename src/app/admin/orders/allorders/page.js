@@ -91,18 +91,15 @@ export default function AllOrder() {
         const storedData = JSON.parse(localStorage.getItem('particularChefOrder'));
         const newChefOrderDataList = localStorage.getItem('newChefOrderDataList');
         const storedLoginChef = localStorage.getItem("loginChef")
-        console.log("storedLoginChef", storedLoginChef)
         if (storedData) {
             try {
                 // Check if the specific chef's data exists
                 if (storedData.hasOwnProperty(storedLoginChef)) {
                     const parsedData = storedData[storedLoginChef]; // Extract the chef's data
-                    console.log("parsedData", storedLoginChef);
 
                     // Only set `newChefOrderDataList` if it does not already exist
                     if (!localStorage.getItem('newChefOrderDataList')) {
                         localStorage.setItem('newChefOrderDataList', JSON.stringify(parsedData));
-                        console.log('Data set in new localStorage key: newChefOrderDataList');
                     }
 
                     // Format and update state as necessary
@@ -129,7 +126,6 @@ export default function AllOrder() {
                         };
                     });
                 } else {
-                    console.warn(`No data found for chef: ${storedLoginChef}`);
                     setColumns({
                         allOrders: [],
                         inProgress: [],
@@ -160,42 +156,34 @@ export default function AllOrder() {
         // Format date range
         const start = startDateRange ? dayjs(startDateRange).format("YYYY-MM-DD") : null;
         const end = endDateRange ? dayjs(endDateRange).format("YYYY-MM-DD") : null;
-        const dataDrag = JSON.parse(localStorage.getItem("dragDropData")) || {
-            allOrders: [],
-            inProgress: [],
-            completeOrder: [],
-        };
 
-        const filterOrders = (orders) => {    // Filter function
-            return orders.filter((order) => {
-                const orderDate = order.date;
+        // Reload the original data from localStorage
+        const dataDrag = JSON.parse(localStorage.getItem("dragDropData"))
 
-                const isOrderMatch = orderNumber
-                    ? order.id.toString() === orderNumber.toString()
-                    : true;
 
-                const isDateInRange = start && end
-                    ? orderDate >= start && orderDate <= end
-                    : true;
+        const filterOrders = dataDrag.filter((order) => {
+            const orderDate = order.date;
 
-                return isOrderMatch && isDateInRange;
-            });
-        };
+            const isOrderMatch = orderNumber
+                ? order.id.toString() === orderNumber.toString()
+                : true;
 
-        // Apply filter to all categories
-        const filteredData = {
-            allOrders: filterOrders(dataDrag.allOrders),
-            inProgress: filterOrders(dataDrag.inProgress),
-            completeOrder: filterOrders(dataDrag.completeOrder),
-        };
-        // Update state
-        setColumns({
-            allOrders: filteredData.allOrders,
-            inProgress: filteredData.inProgress,
-            completeOrder: filteredData.completeOrder,
+            const isDateInRange = start && end
+                ? orderDate >= start && orderDate <= end
+                : true;
+
+            return isOrderMatch && isDateInRange;
         });
 
+
+        // Apply filters to each category
+
+
+
+        // Update state with the filtered data
+        setColumns(filterOrders);
     };
+
 
     // Handle the end of a drag-and-drop operation
     const handleDragEnd = (event) => {
@@ -320,7 +308,7 @@ export default function AllOrder() {
                 <div className="grid grid-cols-3 gap-4 p-4 !bg-red-100">
                     {Object.keys(columns).map((columnId) => (
                         <div key={columnId} className="flex flex-col">
-                            <div className="bg-red-600">
+                            <div className="bg-red-600 py-2">
                                 <h3 className="text-lg font-bold capitalize text-center text-white">{columnId}</h3></div>
                             <Droppable id={columnId}>
                                 {columns[columnId].map((task) => (

@@ -15,14 +15,12 @@ const Login = () => {
     const [error, setError] = useState(null);
     const router = useRouter();
     const session = useSession()
-    console.log("sessionsession", session)
     const onSubmit = async (data) => {
         const { email, password } = data;
         let credentialsArray = localStorage.getItem("credentials") || [];
 
         // Check if email and password match a registered user
 
-        // console.log("credentialsArray", credentialsArray);
         try {
             const res = await signIn("credentials", {
                 email,

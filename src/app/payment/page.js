@@ -13,16 +13,6 @@ function Payment() {
     const [chefs, setChef] = useState([]);
     const [orderUpdateData, setOrderUpdateData] = useState([]);
 
-
-
-
-
-
-
-
-
-
-
     useEffect(() => {
         const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
         setChef(chefList);
@@ -47,7 +37,6 @@ function Payment() {
         setIsClient(true);
         const savedData = localStorage.getItem("orderplaceList");
         if (savedData) {
-            console.log("save", savedData)
             setOrderData(JSON.parse(savedData));
         }
     }, []);
@@ -82,23 +71,18 @@ function Payment() {
 
     // Initialize an empty object to store the assignments
     const assignments = chefs.reduce((acc, chef) => {
-        console.log("acc", acc, chef)
         if (chef.email) {
             acc[chef.email] = []; // Ensure each chef has an array for orders
         }
-        console.log("acc2", acc)
 
         return acc;
     }, {});
-    console.log("assignments", assignments)
     const myOrderUpdate = JSON.parse(localStorage.getItem("myOrders"));
     // // Distribute the orders
     myOrderUpdate?.forEach((order, index) => {
 
         const chefIndex = index % chefs.length; //v Determines which chef gets the order
-        console.log("chefIndex", chefIndex)
         const chefEmail = chefs[chefIndex]?.email; // Safely access the chef's email
-        console.log("chefEmail", chefEmail)
 
         if (chefEmail) {
             assignments[chefEmail].push(order); // Assign order to the chef
@@ -106,7 +90,6 @@ function Payment() {
         localStorage.setItem("particularChefOrder", JSON.stringify(assignments))
     });
 
-    console.log("asss", assignments)
     return (
         <>
             <LayoutHeader pageTitle="Payment Summary" />

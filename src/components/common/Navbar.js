@@ -100,11 +100,27 @@ const Navbar = ({ open, setOpen }) => {
                                     <ShoppingBasketIcon />
                                 </Badge>
                             </Link>
-                            <Button className="!bg-white !text-green-500 font-semibold py-2 px-4 rounded hover:!bg-green-700 hover:!text-white transition duration-200">
-                                <Link href="/auth/signin" className="hover:text-gray-300">
-                                    Login as a chef
-                                </Link>
-                            </Button>
+
+                            {session?.user ? (
+                                <Button className="!bg-white !text-green-500 font-semibold py-2 px-4 rounded hover:!bg-green-700 hover:!text-white transition duration-200">
+                                    <Link href="admin/orders/allorders" className="hover:text-gray-300">
+                                        Login as a chef
+                                    </Link>
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button className="!bg-white !text-green-500 font-semibold py-2 px-4 rounded hover:!bg-green-700 hover:!text-white transition duration-200">
+                                        <Link href="/auth/signin" className="hover:text-gray-300">
+                                            Login as a chef
+                                        </Link>
+                                    </Button>
+                                </>
+                            )}
+
+
+
+
+
 
                         </div>
 

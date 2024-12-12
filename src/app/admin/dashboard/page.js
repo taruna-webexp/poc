@@ -16,11 +16,13 @@ const Assignments = () => {
     const [allData, setAllData] = useState([]);
 
     useEffect(() => {
+
+
         const chefList = JSON.parse(localStorage.getItem("credentials")) || [];
         setChefs(chefList);
 
-        const completeData = JSON.parse(localStorage.getItem("chefCompletedOrder")) || [];
-        setComplete(completeData);
+        const completeData = JSON.parse(localStorage.getItem("dragDropData")) || [];
+        setComplete(completeData.completeOrder);
 
         const data = JSON.parse(localStorage.getItem("chefOrderDataList")) || [];
         const formattedOrders = data.map(({ date, ...rest }) => ({

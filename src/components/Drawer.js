@@ -28,7 +28,7 @@ export default function TemporaryDrawer({ open, setOpen }) {
             text: "Orders",
             icon: <FastfoodIcon />,
             children: [
-                { Title: "Complete Order", path: `/admin/orders/completeorders` },
+
                 { Title: "All Orders", path: `/admin/orders/allorders` },
             ],
         },
